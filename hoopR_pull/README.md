@@ -38,13 +38,13 @@ pip install -r requirements.txt
 **Windows**
 
 ```
-python hooper_pull.py
+python hoopr_pullhoopr_data_pull.py
 
 ```
 
 **Mac**
 
 ```
-python3 hooper_pull.py
+python3 hoopr_data_pull.py
 
 ```
