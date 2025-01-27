@@ -1,5 +1,13 @@
 # How to use hoopr_data_pull.py
 
+This python script inserts data from hoopR to your local mysql server.
+
+| Statement            | Output              |
+|----------------------|---------------------|
+| `show databases;`    | basketball_stats    |
+| `show tables;`       | basketball_data     |
+
+
 
 ## Step 1: Navigate to hoopR_pull folder in command line
 
