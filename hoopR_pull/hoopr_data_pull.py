@@ -72,6 +72,10 @@ def load_hoopr_data():
 
 def clean_column_names(df):
     """Clean column names to be MySQL compatible"""
+    # First, rename any 'id' column from the dataset to avoid conflict with primary key
+    if 'id' in df.columns:
+        df = df.rename(columns={'id': 'original_id'})
+    
     # Replace NaN in column names with 'col_' + index
     df.columns = [f'col_{i}' if pd.isna(col) else col for i, col in enumerate(df.columns)]
     
@@ -85,6 +89,11 @@ def clean_column_names(df):
     seen = {}
     clean_cols = []
     for col in df.columns:
+        # Skip renaming if it's the original 'id' column that we already renamed
+        if col == 'original_id':
+            clean_cols.append(col)
+            continue
+            
         if col in seen:
             seen[col] += 1
             clean_cols.append(f"{col}_{seen[col]}")
@@ -100,7 +109,7 @@ def convert_datetime_columns(df):
     for col in df.columns:
         if pd.api.types.is_datetime64_any_dtype(df[col]):
             # Convert to naive UTC datetime
-            df[col] = df[col].dt.tz_localize(None)
+            df[col] = df[col].dt.strftime('%Y-%m-%d %H:%M:%S')
     return df
 
 def insert_data_to_mysql(connection, df, table_name):
