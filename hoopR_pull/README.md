@@ -38,7 +38,7 @@ pip install -r requirements.txt
 **Windows**
 
 ```
-python hoopr_data_pull.py
+python hoopr_data_pull-Windows.py
 
 ```
 

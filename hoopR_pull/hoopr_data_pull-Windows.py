@@ -60,7 +60,7 @@ def load_hoopr_data():
     
     # Load specific data from hoopR
     r('''
-    data <- load_mbb_pbp(2024)  # Example: loading play-by-play data for 2024
+    data <- load_nba_pbp(2024)  # Example: loading play-by-play data for 2024
     ''')
     
     # Convert R dataframe to pandas dataframe
@@ -108,7 +108,6 @@ def insert_data_to_mysql(connection, df, table_name):
     try:
         # Clean column names
         df = clean_column_names(df)
-
         # Convert datetime columns
         df = convert_datetime_columns(df)
         
@@ -117,7 +116,11 @@ def insert_data_to_mysql(connection, df, table_name):
         
         cursor = connection.cursor()
         
-        # Create table with appropriate column types
+        # Drop the existing table if it exists
+        drop_table_query = f"DROP TABLE IF EXISTS {table_name}"
+        cursor.execute(drop_table_query)
+        
+        # Create column definitions
         column_definitions = []
         for col in df.columns:
             dtype = df[col].dtype
@@ -138,20 +141,20 @@ def insert_data_to_mysql(connection, df, table_name):
             
             column_definitions.append(f"`{col}` {col_type}")
         
+        # Create new table
         create_table_query = f"""
         CREATE TABLE IF NOT EXISTS {table_name} (
-            id INT AUTO_INCREMENT PRIMARY KEY,
             {', '.join(column_definitions)}
         )
         """
         cursor.execute(create_table_query)
         
         # Prepare insert query
-        columns = [f"`{col}`" for col in df.columns]
-        placeholders = ", ".join(["%s"] * len(df.columns))
+        columns = df.columns.tolist()
+        placeholders = ", ".join(["%s"] * len(columns))
         insert_query = f"""
         INSERT INTO {table_name} 
-        ({', '.join(columns)}) 
+        ({', '.join([f'`{col}`' for col in columns])}) 
         VALUES ({placeholders})
         """
         
@@ -170,8 +173,12 @@ def insert_data_to_mysql(connection, df, table_name):
         
     except Error as e:
         print(f"Error inserting data: {e}")
-        # Print more detailed error information
         print("Error details:", e.args)
+        try:
+            cursor.execute(f"DESCRIBE {table_name}")
+            print("Table structure:", cursor.fetchall())
+        except Error as e2:
+            print(f"Error getting table structure: {e2}")
     finally:
         if cursor:
             cursor.close()
