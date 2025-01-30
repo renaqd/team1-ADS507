@@ -1,0 +1,88 @@
+# %%
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# %%
+pbp = pd.read_csv('/Users/mtc/project_test.csv')
+
+pbp = pbp.drop('Unnamed: 0', axis = 1)
+
+
+# %%
+pbp.columns
+
+# %%
+pd.to_datetime(pbp['game_date'])
+pd.to_datetime(pbp['game_date_time'])
+
+# %%
+print(np.unique(pbp['home_team_name']))
+
+# %%
+pbp.groupby(['type_text']).size().reset_index(name = 'count').sort_values(by = 'count', ascending = False)
+
+# %%
+pbp.groupby(['type_text', 'athlete_id_1']).size().reset_index(name = 'count').sort_values(by = 'count',ascending = False)
+
+# %%
+success = pbp.groupby(['scoring_play', 'home_team_name']).size().reset_index(name = 'count').sort_values(by = 'count', ascending = False)
+
+success = pd.DataFrame(success.pivot(index = 'home_team_name', columns = 'scoring_play', values = 'count'))
+
+success.columns = ['not_scoring', 'scoring']
+
+success['scoring'] = success['scoring'].fillna(0)
+
+success['rate'] = success['scoring']/(success['scoring'] + success['not_scoring'])
+
+success.sort_values(by = 'rate', ascending=False)
+
+# %%
+play_suc = pbp.groupby(['scoring_play', 'type_text']).size().reset_index(name = 'count').sort_values(by = 'count', ascending = False)
+
+play_suc = pd.DataFrame(play_suc.pivot(index = 'type_text', columns = 'scoring_play', values = 'count'))
+
+play_suc.columns = ['not_scoring', 'scoring']
+
+play_suc = play_suc[play_suc['scoring'] >= 0]
+
+play_suc['not_scoring'] = play_suc['not_scoring'].fillna(0)
+
+play_suc['rate'] = play_suc['scoring']/(play_suc['scoring'] + play_suc['not_scoring'])
+
+play_suc.sort_values(by = 'rate', ascending=False)
+
+# %%
+index = play_suc.index.to_list()
+
+
+# %%
+index_filter = pbp[pbp['type_text'].isin(index)]
+
+quarter = index_filter.groupby(['scoring_play', 'period_display_value']).size().reset_index(name = 'count').sort_values(by = 'count', ascending = False)
+
+quarter = pd.DataFrame(quarter.pivot(index = 'period_display_value', columns = 'scoring_play', values = 'count'))
+
+quarter.columns = ['not_scoring', 'scoring']
+
+quarter['not_scoring'] = quarter['not_scoring'].fillna(0)
+
+quarter['rate'] = quarter['scoring']/(quarter['scoring'] + quarter['not_scoring'])
+
+quarter.reindex(index = ['1st Quarter', '2nd Quarter', '3rd Quarter', '4th Quarter', 'OT', '2OT'])
+
+# %%
+index_filter = pbp[pbp['type_text'].isin(index)]
+
+team = index_filter.groupby(['scoring_play', 'home_team_name']).size().reset_index(name = 'count').sort_values(by = 'count', ascending = False)
+
+team = pd.DataFrame(team.pivot(index = 'home_team_name', columns = 'scoring_play', values = 'count'))
+
+team.columns = ['not_scoring', 'scoring']
+
+team['rate'] = team['scoring']/(team['scoring'] + team['not_scoring'])
+
+team.sort_values(by = 'rate', ascending = False)
+
+
