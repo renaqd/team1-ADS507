@@ -1,13 +1,10 @@
 import pymysql
-from config import DB_CONFIG
+from config import get_db_connection
 
 def create_database():
     """Creates the NBA database if it doesn't exist."""
-    connection = pymysql.connect(
-        host=DB_CONFIG["host"],
-        user=DB_CONFIG["user"],
-        password=DB_CONFIG["password"]
-    )
+    connection = get_db_connection()
+
     cursor = connection.cursor()
     cursor.execute("CREATE DATABASE IF NOT EXISTS nba_db")
     cursor.close()
@@ -15,7 +12,7 @@ def create_database():
 
 def create_tables():
     """Creates necessary tables for the NBA project."""
-    connection = pymysql.connect(**DB_CONFIG)
+    connection = get_db_connection()
     cursor = connection.cursor()
 
     queries = [
