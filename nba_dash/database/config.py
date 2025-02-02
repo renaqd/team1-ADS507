@@ -1,6 +1,6 @@
 DB_CONFIG = {
     "host": "localhost",
     "user": "root", 
-    "password": "!!sql_pass!!",
+    "password": "<PASSWORD>",
     "database": "nba_db"
 }
