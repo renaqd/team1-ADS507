@@ -1,0 +1,8 @@
+python-dotenv
+rpy2 --pre
+mysql-connector-python
+pandas
+numpy
+nba_api
+pymysql
+config
