@@ -23,7 +23,7 @@ def connect_to_mysql(use_database=True):
     try:
         config = DB_CONFIG.copy()
         if use_database:
-            config['database'] = 'nba_1'
+            config['database'] = 'nba_db2'
             
         connection = mysql.connector.connect(**config)
         if connection.is_connected():

@@ -1,7 +1,7 @@
 from config import connect_to_mysql, execute_query
 
 def create_database():
-    """Create the nba_1 database"""
+    """Create the nba_db2 database"""
     try:
         # Connect without specifying database
         connection = connect_to_mysql(use_database=False)
@@ -9,11 +9,11 @@ def create_database():
             return
         
         # Create database if it doesn't exist
-        execute_query(connection, "CREATE DATABASE IF NOT EXISTS nba_1")
-        print("Database 'nba_1' created or already exists")
+        execute_query(connection, "CREATE DATABASE IF NOT EXISTS nba_db2")
+        print("Database 'nba_db2' created or already exists")
         
         # Switch to the new database
-        execute_query(connection, "USE nba_1")
+        execute_query(connection, "USE nba_db2")
         
     finally:
         if connection and connection.is_connected():
