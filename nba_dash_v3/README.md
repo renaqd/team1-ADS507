@@ -1,50 +1,47 @@
 # How to use hoopr_data_pull.py
 
-This python script inserts data from hoopR to your local mysql server.
+This python script inserts data from nba_api to your local mysql server.
 
-| Statement            | Output              |
-|----------------------|---------------------|
-| `show databases;`    | basketball_stats    |
-| `show tables;`       | basketball_data     |
-
-
-
-## Step 1: Navigate to hoopR_pull folder in command line
-
-**Option 1:** activate your environment with conda
-
-**Option 2:** activate your virtual environment
-```
-.\.venv\Scripts\activate
-
-```
+| Statement         | Output                                         |
+|------------------|-----------------------------------------------|
+| `show databases;` | nba_db                                   |
+| `show tables;`   | teams<br>players<br>hustle_stats |
 
 
-
-## Step 2: Enter MySQL db connection credentials 
+## Step 1: Enter MySQL db connection credentials 
 
 * Modify template.env file and Enter user, pw, and host
 * Rename rename "template.env" file to ".env"
 
-## Step 3: Install dependencies
+## Step 2: Navigate to the /nba_dash_v2 folder in command line
 
+* activate your environment with conda
+
+or 
+
+* Create a virtual environment
+```
+python -m venv .venv
+```
+
+**To activate your virtual environment:**
+
+For Windows:
+```
+.\.venv\Scripts\activate
+```
+
+For macOS/Linux
+```
+source .venv/bin/activate
+```
+
+## Step 3: Install dependencies
 ```
 pip install -r requirements.txt
-
 ```
 
-## Step 4: Run python code
-
-**Windows**
-
+## Step 4: Run main.py script
 ```
-python hoopr_data_pull-Windows.py
-
-```
-
-**Mac**
-
-```
-python3 hoopr_data_pull.py
-
+python main.py
 ```
