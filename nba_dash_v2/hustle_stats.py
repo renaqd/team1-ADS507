@@ -10,15 +10,15 @@ logger = logging.getLogger(__name__)
 
 def get_all_game_ids(connection):
     """
-    Fetch all unique game IDs from the nba_team_game_logs table
+    Fetch all unique game IDs from the nba_team_game_logs table that haven't been processed
     """
     try:
         query = """
         SELECT DISTINCT GAME_ID 
         FROM nba_team_game_logs 
         WHERE GAME_ID NOT IN (
-            SELECT GAME_ID 
-            FROM hustle_stats_available
+            SELECT DISTINCT GAME_ID 
+            FROM hustle_player_stats
         )
         ORDER BY GAME_ID
         """
@@ -42,39 +42,15 @@ def fetch_hustle_stats(game_id):
         hustle_stats = hustlestatsboxscore.HustleStatsBoxScore(game_id=game_id)
         sleep(1)  # Rate limiting
         
-        hustle_stats_available_df = pd.DataFrame(hustle_stats.hustle_stats_available.get_dict()['data'],
-                                               columns=hustle_stats.hustle_stats_available.get_dict()['headers'])
-        
         player_stats_df = pd.DataFrame(hustle_stats.player_stats.get_dict()['data'],
                                      columns=hustle_stats.player_stats.get_dict()['headers'])
         
         logger.info(f"Successfully fetched hustle stats for game {game_id}")
-        return hustle_stats_available_df, player_stats_df
+        return player_stats_df
         
     except Exception as e:
         logger.error(f"Error fetching hustle stats for game {game_id}: {e}")
-        return None, None
-
-def insert_hustle_stats_available(connection, df):
-    """Insert or update hustle stats availability data"""
-    try:
-        insert_query = """
-        INSERT INTO hustle_stats_available (GAME_ID, HUSTLE_STATUS)
-        VALUES (%s, %s)
-        ON DUPLICATE KEY UPDATE
-            HUSTLE_STATUS = VALUES(HUSTLE_STATUS),
-            updated_at = CURRENT_TIMESTAMP
-        """
-        
-        values = df[['GAME_ID', 'HUSTLE_STATUS']].values.tolist()
-        
-        for value in values:
-            execute_query(connection, insert_query, value)
-            
-        logger.info(f"Successfully inserted/updated hustle stats availability for {len(values)} games")
-        
-    except Error as e:
-        logger.error(f"Error inserting hustle stats availability data: {e}")
+        return None
 
 def insert_player_hustle_stats(connection, df):
     """Insert or update player hustle stats data"""
@@ -162,10 +138,9 @@ def run_fetch_hustle_stats():
         for i, game_id in enumerate(game_ids, 1):
             logger.info(f"Processing game {i} of {total_games} ({game_id})")
             
-            hustle_stats_df, player_stats_df = fetch_hustle_stats(game_id)
+            player_stats_df = fetch_hustle_stats(game_id)
             
-            if hustle_stats_df is not None and player_stats_df is not None:
-                insert_hustle_stats_available(connection, hustle_stats_df)
+            if player_stats_df is not None:
                 insert_player_hustle_stats(connection, player_stats_df)
             
             # Commit after each game to save progress

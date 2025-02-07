@@ -140,17 +140,6 @@ def create_tables():
         )
         """
 
-        create_hustle_stats_available_table = """
-        CREATE TABLE IF NOT EXISTS hustle_stats_available (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            GAME_ID VARCHAR(10),
-            HUSTLE_STATUS BOOLEAN,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            UNIQUE KEY unique_game (GAME_ID)
-        )
-        """
-
         create_hustle_player_stats_table = """
         CREATE TABLE IF NOT EXISTS hustle_player_stats (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -190,7 +179,6 @@ def create_tables():
         execute_query(connection, create_teams_table)
         execute_query(connection, create_game_logs_table)
         execute_query(connection, create_player_stats_table)
-        execute_query(connection, create_hustle_stats_available_table)
         execute_query(connection, create_hustle_player_stats_table)
         
         print("All tables created successfully")
