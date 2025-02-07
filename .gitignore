@@ -1,5 +1,8 @@
 temp/*
+nba_dash2/*
+nba_dash_v2/__pycache__/*
 .DS_Store
+
 
 # Environments
 .env

@@ -45,9 +45,9 @@ def main():
 
 
         # Step 4: Fetch and insert advanced stats
-        logger.info("Fetching advanced stats...")
-        player_advanced_stats.run_fetch_advanced_stats()
-        logger.info("Advanced stats fetch complete!")
+        # logger.info("Fetching advanced stats...")
+        # player_advanced_stats.run_fetch_advanced_stats()
+        # logger.info("Advanced stats fetch complete!")
 
         logger.info("All operations completed successfully!")
 

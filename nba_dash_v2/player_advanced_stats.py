@@ -4,8 +4,8 @@ from nba_api.stats.endpoints import boxscoreadvancedv3
 from config import connect_to_mysql, execute_query
 import time
 from datetime import datetime
+from mysql.connector import Error
 # import mysql.connector
-# from mysql.connector import Error
 
 
 def create_advanced_stats_tables(connection):

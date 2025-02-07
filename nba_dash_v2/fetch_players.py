@@ -1,6 +1,7 @@
 import pandas as pd
 from nba_api.stats.static import players
 from config import connect_to_mysql, execute_query
+from mysql.connector import Error
 
 def fetch_nba_players():
     """Fetch all NBA players data"""

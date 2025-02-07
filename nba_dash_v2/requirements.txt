@@ -1,5 +1,4 @@
 python-dotenv
-rpy2 --pre
 mysql-connector-python
 pandas
 numpy

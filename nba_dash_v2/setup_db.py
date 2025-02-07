@@ -1,15 +1,19 @@
 from config import connect_to_mysql, execute_query
 
 def create_database():
-    """Create the nba_season database"""
+    """Create the nba_1 database"""
     try:
-        connection = connect_to_mysql()
+        # Connect without specifying database
+        connection = connect_to_mysql(use_database=False)
         if not connection:
             return
         
         # Create database if it doesn't exist
-        execute_query(connection, "CREATE DATABASE IF NOT EXISTS nba_season")
-        print("Database 'nba_season' created or already exists")
+        execute_query(connection, "CREATE DATABASE IF NOT EXISTS nba_1")
+        print("Database 'nba_1' created or already exists")
+        
+        # Switch to the new database
+        execute_query(connection, "USE nba_1")
         
     finally:
         if connection and connection.is_connected():
@@ -19,7 +23,8 @@ def create_tables():
     """Create all necessary tables"""
     connection = None
     try:
-        connection = connect_to_mysql()
+        # Now connect with database specified
+        connection = connect_to_mysql(use_database=True)
         if not connection:
             return
 

@@ -11,13 +11,21 @@ DB_CONFIG = {
     'user': os.environ.get('DB_USER'),
     'password': os.environ.get('DB_PASSWORD'),
     'host': os.environ.get('DB_HOST'),
-    'database': 'nba_season'
 }
 
-def connect_to_mysql():
-    """Establish connection to MySQL database"""
+def connect_to_mysql(use_database=True):
+    """
+    Establish connection to MySQL database
+    Args:
+        use_database (bool): If True, connects to nba_season database. 
+                           If False, connects without specifying database.
+    """
     try:
-        connection = mysql.connector.connect(**DB_CONFIG)
+        config = DB_CONFIG.copy()
+        if use_database:
+            config['database'] = 'nba_1'
+            
+        connection = mysql.connector.connect(**config)
         if connection.is_connected():
             print("Successfully connected to MySQL database")
             return connection
@@ -26,7 +34,6 @@ def connect_to_mysql():
         return None
 
 def execute_query(connection, query, params=None, fetch=False):
-    """Execute a query with proper cursor handling"""
     cursor = None
     try:
         cursor = connection.cursor(buffered=True)
@@ -37,10 +44,10 @@ def execute_query(connection, query, params=None, fetch=False):
             
         if fetch:
             result = cursor.fetchall()
-            return result
         else:
             connection.commit()
-            return None
+            result = cursor.rowcount
+        return result
     finally:
         if cursor:
             cursor.close()
