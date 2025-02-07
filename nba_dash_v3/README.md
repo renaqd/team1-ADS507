@@ -1,4 +1,4 @@
-# How to use hoopr_data_pull.py
+# How to use main.py
 
 This python script inserts data from nba_api to your local mysql server.
 
@@ -26,15 +26,15 @@ python -m venv .venv
 
 **To activate your virtual environment:**
 
-For Windows:
-```
-.\.venv\Scripts\activate
-```
+> For Windows:
+> ```
+> .\.venv\Scripts\activate
+> ```
 
-For macOS/Linux
-```
-source .venv/bin/activate
-```
+> For macOS/Linux
+> ```
+> source .venv/bin/activate
+> ```
 
 ## Step 3: Install dependencies
 ```
