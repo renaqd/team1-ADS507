@@ -139,12 +139,59 @@ def create_tables():
             UNIQUE KEY unique_player_game (game_id, person_id)
         )
         """
+
+        create_hustle_stats_available_table = """
+        CREATE TABLE IF NOT EXISTS hustle_stats_available (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            GAME_ID VARCHAR(10),
+            HUSTLE_STATUS BOOLEAN,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY unique_game (GAME_ID)
+        )
+        """
+
+        create_hustle_player_stats_table = """
+        CREATE TABLE IF NOT EXISTS hustle_player_stats (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            GAME_ID VARCHAR(10),
+            TEAM_ID INT,
+            TEAM_ABBREVIATION VARCHAR(10),
+            TEAM_CITY VARCHAR(255),
+            PLAYER_ID INT,
+            PLAYER_NAME VARCHAR(255),
+            START_POSITION VARCHAR(5),
+            COMMENT TEXT,
+            MINUTES VARCHAR(10),
+            PTS INT,
+            CONTESTED_SHOTS INT,
+            CONTESTED_SHOTS_2PT INT,
+            CONTESTED_SHOTS_3PT INT,
+            DEFLECTIONS INT,
+            CHARGES_DRAWN INT,
+            SCREEN_ASSISTS INT,
+            SCREEN_AST_PTS INT,
+            OFF_LOOSE_BALLS_RECOVERED INT,
+            DEF_LOOSE_BALLS_RECOVERED INT,
+            LOOSE_BALLS_RECOVERED INT,
+            OFF_BOXOUTS INT,
+            DEF_BOXOUTS INT,
+            BOX_OUT_PLAYER_TEAM_REBS INT,
+            BOX_OUT_PLAYER_REBS INT,
+            BOX_OUTS INT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY unique_player_game (GAME_ID, PLAYER_ID)
+        )
+        """
         
         # Execute all creation queries
         execute_query(connection, create_players_table)
         execute_query(connection, create_teams_table)
         execute_query(connection, create_game_logs_table)
         execute_query(connection, create_player_stats_table)
+        execute_query(connection, create_hustle_stats_available_table)
+        execute_query(connection, create_hustle_player_stats_table)
         
         print("All tables created successfully")
         

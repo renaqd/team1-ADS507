@@ -5,6 +5,7 @@ import fetch_teams
 import fetch_players
 import nba_team_game_logs
 import player_advanced_stats
+import hustle_stats
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -41,6 +42,11 @@ def main():
         logger.info("Fetching game log data...")
         nba_team_game_logs.run_nba_team_game_logs()
         logger.info("Game log data fetch complete!")
+
+        # Step 4: Fetch hustle data
+        logger.info("Fetching hustle stats...")
+        hustle_stats.run_fetch_hustle_stats()
+        logger.info("Hustle stats fetch complete!")
 
 
 
