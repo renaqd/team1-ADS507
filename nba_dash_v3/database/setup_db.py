@@ -26,15 +26,6 @@ def create_tables():
         connection = connect_to_mysql()
         queries = [
             """
-            CREATE TABLE IF NOT EXISTS players (
-                player_id INT PRIMARY KEY,
-                full_name VARCHAR(255),
-                position VARCHAR(255),
-                team_id INT,
-                team_name VARCHAR(255)
-            )
-            """,
-            """
             CREATE TABLE IF NOT EXISTS teams (
                 team_id INT PRIMARY KEY,
                 season_year VARCHAR(10),
@@ -48,9 +39,19 @@ def create_tables():
             )
             """,
             """
+            CREATE TABLE IF NOT EXISTS players (
+                player_id INT PRIMARY KEY,
+                full_name VARCHAR(255),
+                position VARCHAR(255),
+                team_id INT,
+                FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE SET NULL
+            )
+            """,
+            """
             CREATE TABLE IF NOT EXISTS hustle_stats (
                 game_id INT,
                 player_id INT,
+                team_id INT,
                 game_date DATE,
                 matchup VARCHAR(255),
                 minutes INT,
@@ -69,8 +70,15 @@ def create_tables():
                 def_boxouts INT,
                 boxouts INT,
                 PRIMARY KEY (game_id, player_id),
-                FOREIGN KEY (player_id) REFERENCES players(player_id) ON DELETE CASCADE
+                FOREIGN KEY (player_id) REFERENCES players(player_id),
+                FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE SET NULL
             )
+            """,
+            """
+            CREATE INDEX idx_player_team ON players(team_id);
+            """,
+            """
+            CREATE INDEX idx_hustle_game ON hustle_stats(game_id);
             """
         ]
         for query in queries:

@@ -36,6 +36,7 @@ def fetch_game_with_retry(game_id, max_retries=3, base_delay=2):
     
     raise Exception(f"Failed to fetch game {game_id} after {max_retries} attempts")
 
+# Remove the get game date
 def get_game_date(game_id):
     """Extract date from game ID with proper formatting"""
     try:
@@ -65,8 +66,14 @@ def fetch_game_ids(days_back=7):
         if 'LeagueGameFinderResults' not in games:
             logging.error("No game results found in API response")
             return []
-            
-        return [str(game['GAME_ID']) for game in games['LeagueGameFinderResults']]
+        
+        game_data = [
+            (str(game['GAME_ID']), datetime.strptime(game['GAME_DATE'], '%Y-%m-%d').date())  # Get game_id and date
+            for game in games['LeagueGameFinderResults']
+        ]
+
+        return game_data
+    
     except Exception as e:
         logging.error(f"Error fetching game IDs: {e}")
         return []
@@ -83,14 +90,14 @@ def insert_hustle_stats_batch(stats_list):
         cursor = connection.cursor()
         sql = """
         INSERT INTO hustle_stats (
-            game_id, player_id, game_date, matchup, minutes, pts,
+            game_id, team_id, player_id, game_date, matchup, minutes, pts,
             contested_shots, contested_shots_2pt, contested_shots_3pt,
             deflections, charges_drawn, screen_assists, screen_ast_pts,
             off_loose_balls_recovered, def_loose_balls_recovered,
             loose_balls_recovered, off_boxouts, def_boxouts, boxouts
         )
         VALUES (
-            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
         )
         ON DUPLICATE KEY UPDATE 
             minutes = VALUES(minutes),
@@ -122,27 +129,23 @@ def insert_hustle_stats_batch(stats_list):
 
 def fetch_hustle_stats(days_back=7):
     """Fetch and store hustle stats for games in the last N days."""
-    game_ids = fetch_game_ids(days_back)
-    if not game_ids:
+    game_data_list = fetch_game_ids(days_back)
+    if not game_data_list:
         logging.warning("No games found for the specified period")
         return
     
-    logging.info(f"Found {len(game_ids)} games to process")
+    logging.info(f"Found {len(game_data_list)} games to process")
     stats_list = []
     
     # Process games in batches
     batch_size = 5
-    for i in range(0, len(game_ids), batch_size):
-        batch = game_ids[i:i + batch_size]
+    for i in range(0, len(game_data_list), batch_size):
+        batch = game_data_list[i:i + batch_size]
         
-        for game_id in batch:
+        for game_id, game_date in batch:
             try:
                 player_stats = fetch_game_with_retry(game_id)
-                game_date = get_game_date(game_id)
-                
-                if not game_date:
-                    continue
-                
+            
                 for player in player_stats:
                     # Convert minutes from MM:SS format to integer seconds
                     minutes_str = player.get('MINUTES', '0:00')
@@ -155,6 +158,7 @@ def fetch_hustle_stats(days_back=7):
                     stats_list.append((
                         int(game_id),
                         int(player['PLAYER_ID']),
+                        int(player['TEAM_ID']),
                         game_date,
                         f"{player.get('TEAM_CITY', '')} vs {player.get('TEAM_ABBREVIATION', '')}",
                         minutes,
