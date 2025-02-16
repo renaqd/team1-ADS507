@@ -54,23 +54,29 @@ def fetch_game_ids(days_back=7):
     Fetch game IDs for the last N days
     """
     try:
+        nba_team_ids = set(range(1610612737, 1610612767))  # Specify NBA team IDs only
+
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days_back)
-        
-        games = LeagueGameFinder(
+
+        all_games = LeagueGameFinder(
             date_from_nullable=start_date.strftime('%m/%d/%Y'),
             date_to_nullable=end_date.strftime('%m/%d/%Y'),
             timeout=60
-        ).get_normalized_dict()
+        ).get_normalized_dict()['LeagueGameFinderResults']
+
+        games = [game for game in all_games if game.get('TEAM_ID') in nba_team_ids]
         
-        if 'LeagueGameFinderResults' not in games:
-            logging.error("No game results found in API response")
-            return []
+        #if 'LeagueGameFinderResults' not in games:
+        #    logging.error("No game results found in API response")
+        #    return []
         
         game_data = [
-            (str(game['GAME_ID']), datetime.strptime(game['GAME_DATE'], '%Y-%m-%d').date())  # Get game_id and date
-            for game in games['LeagueGameFinderResults']
+            (str(game['GAME_ID']), datetime.strptime(game['GAME_DATE'], '%Y-%m-%d').date(), game['MATCHUP'])  # Get game_id and date
+            for game in games
         ]
+        
+        logging.info(f"Fetched {len(game_data)} game IDs successfully.")
 
         return game_data
     
@@ -90,7 +96,7 @@ def insert_hustle_stats_batch(stats_list):
         cursor = connection.cursor()
         sql = """
         INSERT INTO hustle_stats (
-            game_id, team_id, player_id, game_date, matchup, minutes, pts,
+            game_id, player_id, team_id, game_date, matchup, minutes, pts,
             contested_shots, contested_shots_2pt, contested_shots_3pt,
             deflections, charges_drawn, screen_assists, screen_ast_pts,
             off_loose_balls_recovered, def_loose_balls_recovered,
@@ -139,10 +145,12 @@ def fetch_hustle_stats(days_back=7):
     
     # Process games in batches
     batch_size = 5
-    for i in range(0, len(game_data_list), batch_size):
+    max_games = 2 ### adding limit for testing ###
+
+    for i in range(0, min(max_games, len(game_data_list)), batch_size):
         batch = game_data_list[i:i + batch_size]
         
-        for game_id, game_date in batch:
+        for game_id, game_date, matchup in batch:
             try:
                 player_stats = fetch_game_with_retry(game_id)
             
@@ -160,7 +168,7 @@ def fetch_hustle_stats(days_back=7):
                         int(player['PLAYER_ID']),
                         int(player['TEAM_ID']),
                         game_date,
-                        f"{player.get('TEAM_CITY', '')} vs {player.get('TEAM_ABBREVIATION', '')}",
+                        matchup,
                         minutes,
                         int(player.get('PTS', 0)),
                         int(player.get('CONTESTED_SHOTS', 0)),

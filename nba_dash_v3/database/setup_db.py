@@ -43,8 +43,8 @@ def create_tables():
                 player_id INT PRIMARY KEY,
                 full_name VARCHAR(255),
                 position VARCHAR(255),
-                team_id INT,
-                FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE SET NULL
+                team_id INT
+                -- FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE SET NULL
             )
             """,
             """
@@ -69,9 +69,9 @@ def create_tables():
                 off_boxouts INT,
                 def_boxouts INT,
                 boxouts INT,
-                PRIMARY KEY (game_id, player_id),
-                FOREIGN KEY (player_id) REFERENCES players(player_id),
-                FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE SET NULL
+                PRIMARY KEY (game_id, player_id)
+                -- FOREIGN KEY (player_id) REFERENCES players(player_id),
+                -- FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE SET NULL
             )
             """,
             """
@@ -79,8 +79,12 @@ def create_tables():
             """,
             """
             CREATE INDEX idx_hustle_game ON hustle_stats(game_id);
+            """,
             """
-        ]
+            INSERT INTO teams (team_id, season_year, team_city, team_name, team_abbreviation, team_conference, wins, losses, win_pct)
+            VALUES (0, "2024-25", 'Free Agents', 'Free Agents', 'FA', 'FA', 0, 0, 0.0);
+            """
+        ] # add 0 team for free agents
         for query in queries:
             execute_query(connection, query)
         print("Tables created successfully")

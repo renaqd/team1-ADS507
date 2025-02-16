@@ -8,7 +8,7 @@ import random
 
 logging.basicConfig(level=logging.INFO)
 
-def fetch_team_with_retry(team_id, max_retries=3, base_delay=2):
+def fetch_team_with_retry(team_id, max_retries=3, base_delay=0):
     """
     Fetch team data with retry logic and exponential backoff
     """
@@ -42,9 +42,9 @@ def fetch_teams():
             common_info = fetch_team_with_retry(team_id)
             
             # Set default values for stats that might not be available
-            wins = common_info.get('WINS', 0)
-            losses = common_info.get('LOSSES', 0)
-            win_pct = common_info.get('WIN_PCT', 0.0)
+            wins = common_info.get('W', 0)
+            losses = common_info.get('L', 0)
+            win_pct = common_info.get('PCT', 0.0)
             
             team_info_list.append((
                 common_info['TEAM_ID'],
