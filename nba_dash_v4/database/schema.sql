@@ -51,8 +51,6 @@ CREATE TABLE IF NOT EXISTS hustle_stats (
     PRIMARY KEY (game_id, player_id),
     INDEX idx_hustle_game (game_id),
     INDEX idx_hustle_team (team_id),
-    FOREIGN KEY (player_id) REFERENCES players(player_id),
-    FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE SET NULL
 );
 
 -- Insert the Free Agents team
