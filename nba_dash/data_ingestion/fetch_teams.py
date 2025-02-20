@@ -1,68 +1,86 @@
 import logging
-from nba_api.stats.static import teams
-from nba_api.stats.endpoints import TeamInfoCommon
-import mysql.connector
-import pymysql
+import time
+from nba_api.stats.endpoints import LeagueStandings
 from database.config import get_db_connection
-
+from requests.exceptions import Timeout, ConnectionError
+import random
 
 logging.basicConfig(level=logging.INFO)
 
-def fetch_teams():
-    """Get all active NBA players info."""
-
-    active_team_ids = [team['id'] for team in teams.get_teams()]
-    team_info_list = []
-    
-    for team_id in active_team_ids:
+def fetch_teams_with_retry(max_retries=3, base_delay=1):
+    for attempt in range(max_retries):
         try:
-            team_data = TeamInfoCommon(team_id=team_id).get_normalized_dict()
-            common_info = team_data['TeamInfoCommon'][0]
+            time.sleep(base_delay + random.uniform(0, 1))
+            
+            standings = LeagueStandings(
+                season="2024-25",
+                season_type="Regular Season",
+                timeout=60
+            ).get_normalized_dict()
+            
+            return standings['Standings']
+            
+        except (Timeout, ConnectionError) as e:
+            delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+            logging.warning(f"Attempt {attempt + 1}/{max_retries} failed for fetching teams. "
+                          f"Retrying in {delay:.2f} seconds... Error: {e}")
+            time.sleep(delay)
+    
+    raise Exception(f"Failed to fetch teams after {max_retries} attempts")
 
+def fetch_teams():
+    try:
+        teams_data = fetch_teams_with_retry()
+        team_info_list = []
+        
+        for team in teams_data:
             team_info_list.append((
-                common_info['TEAM_ID'],
-                common_info['SEASON_YEAR'],
-                common_info['TEAM_CITY'],
-                common_info['TEAM_NAME'],
-                common_info['TEAM_ABBREVIATION'],
-                common_info['TEAM_CONFERENCE'],
-                common_info['WINS'],
-                common_info['LOSSES'],
-                common_info['WIN_PCT']
+                team['TeamID'],
+                "2024-25",
+                team['TeamCity'],
+                team['TeamName'],
+                team['TeamAbbreviation'],
+                team['Conference'],
+                team['WINS'],
+                team['LOSSES'],
+                team['WinPCT']
             ))
-        except Exception as e:
-            print(f"Error fetching player {team_id}: {e}")
-
-    # Batch insert into the database
-    if team_info_list:
-        insert_team_batch(team_info_list)
-
+            logging.info(f"Successfully fetched data for {team['TeamCity']} {team['TeamName']}")
+        
+        if team_info_list:
+            insert_team_batch(team_info_list)
+        else:
+            logging.warning("No team data was collected to insert into database")
+    
+    except Exception as e:
+        logging.error(f"Error fetching teams: {e}")
 
 def insert_team_batch(team_info_list):
-    """Insert a batch of player records into the database."""
-    
-    connection = get_db_connection()
-    cursor = connection.cursor()
-
-    sql = """
-    INSERT INTO teams (team_id, season_year, team_city, team_name, team_abbreviation, team_conference, wins, losses, win_pct)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-    ON DUPLICATE KEY UPDATE 
-        season_year = VALUES(season_year),
-        team_city = VALUES(team_city),
-        team_name = VALUES(team_name),
-        team_abbreviation = VALUES(team_abbreviation),
-        team_conference = VALUES(team_conference),
-        wins = VALUES(wins),
-        losses = VALUES(losses),
-        win_pct = VALUES(win_pct)
-    """
-
-    cursor.executemany(sql, team_info_list)  # Efficient batch insert
-    connection.commit()
-    connection.close()
-    print(f"Inserted {len(team_info_list)} players successfully.")
+    connection = None
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        sql = """
+        INSERT INTO teams (team_id, season_year, team_city, team_name, team_abbreviation, 
+                         team_conference, wins, losses, win_pct)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE 
+            season_year = VALUES(season_year),
+            team_city = VALUES(team_city),
+            team_name = VALUES(team_name),
+            team_abbreviation = VALUES(team_abbreviation),
+            team_conference = VALUES(team_conference),
+            wins = VALUES(wins),
+            losses = VALUES(losses),
+            win_pct = VALUES(win_pct)
+        """
+        cursor.executemany(sql, team_info_list)
+        connection.commit()
+        print(f"Inserted or updated {len(team_info_list)} teams successfully.")
+    finally:
+        if connection:
+            connection.close()
 
 if __name__ == "__main__":
-    logging.info("Fetching teams...")
+    logging.info("Fetching recent teams data...")
     fetch_teams()

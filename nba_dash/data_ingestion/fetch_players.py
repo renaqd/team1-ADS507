@@ -1,61 +1,72 @@
 import logging
-from nba_api.stats.static import players
-from nba_api.stats.endpoints import CommonPlayerInfo
-import mysql.connector
-import pymysql
+from nba_api.stats.endpoints import CommonAllPlayers
+import time
 from database.config import get_db_connection
-
 
 logging.basicConfig(level=logging.INFO)
 
-def fetch_players():
-    """Get all active NBA players info."""
-
-    active_player_ids = [player['id'] for player in players.get_active_players()]
-    player_info_list = []
-    
-    for player_id in active_player_ids:
-        try:
-            player_data = CommonPlayerInfo(player_id=player_id).get_normalized_dict()
-            common_info = player_data['CommonPlayerInfo'][0]
-
-            player_info_list.append((
-                common_info['PERSON_ID'],
-                common_info['DISPLAY_FIRST_LAST'],
-                common_info['POSITION'],
-                common_info['TEAM_ID'], 
-                common_info['TEAM_NAME'] 
-            ))
-        except Exception as e:
-            print(f"Error fetching player {player_id}: {e}")
-
-    # Batch insert into the database
-    if player_info_list:
-        insert_players_batch(player_info_list)
-
-
-
 def insert_players_batch(player_info_list):
-    """Insert a batch of player records into the database."""
-    
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    if not player_info_list:
+        logging.warning("No players to insert")
+        return
 
-    sql = """
-    INSERT INTO players (player_id, full_name, position, team_id, team_name)
-    VALUES (%s, %s, %s, %s, %s)
-    ON DUPLICATE KEY UPDATE 
-        full_name = VALUES(full_name),
-        position = VALUES(position),
-        team_id = VALUES(team_id),
-        team_name = VALUES(team_name)
-    """
+    connection = None
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        sql = """
+        INSERT INTO players (player_id, player_name, position, team_id)
+        VALUES (%s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE
+            player_name = VALUES(player_name),
+            position = VALUES(position),
+            team_id = VALUES(team_id)
+        """
+        cursor.executemany(sql, player_info_list)
+        connection.commit()
+        logging.info(f"Inserted or updated {len(player_info_list)} players successfully.")
+    except Exception as e:
+        logging.error(f"Error inserting players: {e}")
+        if connection:
+            connection.rollback()
+    finally:
+        if connection:
+            connection.close()
 
-    cursor.executemany(sql, player_info_list)  # Efficient batch insert
-    connection.commit()
-    connection.close()
-    print(f"Inserted {len(player_info_list)} players successfully.")
+def fetch_players():
+    max_retries = 3
+    retry_delay = 5  # seconds
+
+    for attempt in range(max_retries):
+        try:
+            all_players = CommonAllPlayers(is_only_current_season=1, league_id="00", season="2024-25").get_normalized_dict()['CommonAllPlayers']
+            
+            player_info_list = []
+            for player in all_players:
+                player_info = (
+                    player['PERSON_ID'],
+                    player['DISPLAY_FIRST_LAST'],
+                    player['POSITION'],
+                    player['TEAM_ID']
+                )
+                player_info_list.append(player_info)
+                logging.info(f"Successfully fetched data for {player['DISPLAY_FIRST_LAST']}")
+            
+            if player_info_list:
+                insert_players_batch(player_info_list)
+                logging.info(f"Successfully inserted {len(player_info_list)} players into the database")
+            else:
+                logging.warning("No player data was collected to insert into database")
+            
+            return  # Exit the function if successful
+        
+        except Exception as e:
+            logging.error(f"Error fetching players (attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                logging.info(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                logging.error("Max retries reached. Unable to fetch player data.")
 
 if __name__ == "__main__":
-    logging.info("Fetching players...")
     fetch_players()
