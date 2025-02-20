@@ -1,5 +1,5 @@
 -- Create the database
-CREATE DATABASE IF NOT EXISTS nba_db;
+-- CREATE DATABASE IF NOT EXISTS nba_db;
 
 -- Select database
 USE nba_db;
