@@ -39,7 +39,7 @@ def fetch_players():
 
     for attempt in range(max_retries):
         try:
-            all_players = CommonAllPlayers(is_only_current_season=1, league_id="00", season="2023-24").get_normalized_dict()['CommonAllPlayers']
+            all_players = CommonAllPlayers(is_only_current_season=1, league_id="00", season="2024-25").get_normalized_dict()['CommonAllPlayers']
             
             player_info_list = []
             for player in all_players:
