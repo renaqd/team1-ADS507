@@ -166,7 +166,7 @@ def fetch_hustle_stats(days_back=7):
                     stats_list.append((
                         int(game_id),
                         int(player['PLAYER_ID']),
-                        int(player['TEAM_ID']),
+                        int(player.get('TEAM_ID', 0)),
                         game_date,
                         matchup,
                         minutes,
