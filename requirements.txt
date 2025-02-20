@@ -1,0 +1,9 @@
+python-dotenv
+mysql-connector-python
+pandas
+numpy
+nba_api
+pymysql
+config
+streamlit
+plotly
