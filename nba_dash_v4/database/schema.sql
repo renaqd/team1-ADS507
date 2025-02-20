@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS hustle_stats (
     boxouts INT,
     PRIMARY KEY (game_id, player_id),
     INDEX idx_hustle_game (game_id),
-    INDEX idx_hustle_team (team_id),
+    INDEX idx_hustle_team (team_id)
 );
 
 -- Insert the Free Agents team
