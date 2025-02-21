@@ -1,13 +1,12 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from database_utils import get_database_connection
 
-@st.cache_data(ttl=600)
+conn = st.connection("sql", type="sql", driver="pymysql")
+
 def get_player_stats():
-    conn = get_database_connection()
-    if conn:
-        query = """
+    df = conn.query(
+        """
         SELECT p.full_name as player_name, t.team_abbreviation,
                AVG(h.pts) as avg_points, AVG(h.contested_shots) as avg_contested_shots,
                AVG(h.deflections) as avg_deflections, AVG(h.charges_drawn) as avg_charges_drawn,
@@ -17,10 +16,8 @@ def get_player_stats():
         JOIN teams t ON p.team_id = t.team_id
         GROUP BY p.player_id
         """
-        df = pd.read_sql(query, conn)
-        conn.close()
-        return df
-    return pd.DataFrame()
+    )
+    return df
 
 def run():
     st.title("NBA Player Comparison Dashboard")
