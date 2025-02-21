@@ -5,3 +5,5 @@ numpy
 nba_api
 pymysql
 config
+sqlalchemy
+streamlit

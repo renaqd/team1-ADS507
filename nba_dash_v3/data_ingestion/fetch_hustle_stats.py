@@ -49,7 +49,7 @@ def get_game_date(game_id):
         logging.error(f"Error parsing date from game_id {game_id}: {e}")
         return None
 
-def fetch_game_ids(days_back=7):
+def fetch_game_ids(days_back):
     """
     Fetch game IDs for the last N days
     """
@@ -133,7 +133,7 @@ def insert_hustle_stats_batch(stats_list):
         if connection:
             connection.close()
 
-def fetch_hustle_stats(days_back=7):
+def fetch_hustle_stats(days_back = 14):
     """Fetch and store hustle stats for games in the last N days."""
     game_data_list = fetch_game_ids(days_back)
     if not game_data_list:
