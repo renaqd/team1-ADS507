@@ -1,6 +1,13 @@
 # team1-ADS507
 Practical Data Engineering - Final Team Project
 
+### Data Source
+https://github.com/swar/nba_api (API Client for www.nba.com)
+> Datasets
+- HustleStatsBoxScore
+- teams
+- players
+
 
 ## Overview
 
