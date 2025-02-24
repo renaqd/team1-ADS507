@@ -39,7 +39,6 @@ This project is a comprehensive NBA statistics analysis system with a focus on h
 - SQL queries use **parameterized inputs** to prevent SQL injection.
 
 
-
 ## Contents
 ```plaintext
 team1-ADS507/nba_dash/ 
@@ -74,3 +73,20 @@ team1-ADS507/nba_dash/
 ![Pipeline Deployment](imgs/pipeline.PNG)
 
 ## Pipeline Monitoring
+The project implements basic monitoring through logging.
+
+**Logging:**
+- The project uses Python's built-in `logging` module.
+- Logging is set up in most files using:
+  ```python
+  logging.basicConfig(level=logging.INFO)
+- Various informational and error messages are logged throughout the code.
+
+**Console Output:**
+- Many operations print status messages to the console.
+
+**Error Handling:**
+- Try-except blocks are used to catch and log errors.
+
+**Database Feedback:**
+- Some functions return the number of rows affected by database operations.
