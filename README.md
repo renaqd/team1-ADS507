@@ -3,39 +3,41 @@ Practical Data Engineering - Final Team Project
 
 
 ## Overview
-This Project is a comprehensive NBA statistics analysis system with a focus on hustle stats. Here's the project structure and its main components:
 
-    Database Configuration and Setup:
-        The project uses MySQL as the database.
-        Environment variables are used for database credentials.
-        There's a setup script to create and populate the database.
+This project is a comprehensive NBA statistics analysis system with a focus on hustle stats. Below is an overview of its main components:
 
-    Data Ingestion:
-        The system fetches data from the NBA API for players, teams, and hustle stats.
-        It uses the nba_api library to interact with the NBA's official API.
-        There are retry mechanisms and error handling for API requests.
+### Database Configuration and Setup
+- The project uses **MySQL** as the database.
+- Environment variables are used for database credentials.
+- A setup script is available to create and populate the database.
 
-    Data Models:
-        The database schema includes tables for players, teams, and hustle stats.
+### Data Ingestion
+- The system fetches data from the **NBA API** for players, teams, and hustle stats.
+- It utilizes the `nba_api` library to interact with the NBA's official API.
+- Includes retry mechanisms and error handling for API requests.
 
-    Scripts:
-        There are scripts for initial setup and data updates.
-        The main.py file allows users to choose between initial setup and updates.
+### Data Models
+- The database schema includes tables for **players**, **teams**, and **hustle stats**.
 
-    Web Application:
-        The project includes a Streamlit-based web application for data visualization.
-        It has separate dashboards for team and player comparisons.
-        The app uses Plotly for creating interactive charts.
+### Scripts
+- Contains scripts for **initial setup** and **data updates**.
+- The `main.py` file allows users to choose between **initial setup** and **updates**.
 
-    Error Handling and Logging:
-        The code includes extensive error handling and logging throughout.
+### Web Application
+- A **Streamlit-based web application** is included for data visualization.
+- Features separate dashboards for **team and player comparisons**.
+- Uses **Plotly** for creating interactive charts.
 
-    Performance Considerations:
-        The app uses caching for database queries to improve performance.
+### Error Handling and Logging
+- The code includes extensive **error handling** and **logging** throughout.
 
-    Security:
-        Database credentials are stored in environment variables.
-        SQL queries use parameterized inputs to prevent SQL injection.
+### Performance Considerations
+- Implements **caching** for database queries to improve performance.
+
+### Security
+- Database credentials are stored in **environment variables**.
+- SQL queries use **parameterized inputs** to prevent SQL injection.
+
 
 
 ## Contents
