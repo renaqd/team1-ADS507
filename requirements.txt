@@ -7,3 +7,5 @@ pymysql
 config
 streamlit
 plotly
+apscheduler
+sqlalchemy
