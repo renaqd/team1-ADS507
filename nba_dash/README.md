@@ -1,4 +1,4 @@
-# How to use main.py
+# Insert Data onto Local MySQL and Run Dashboard
 
 This python script inserts data from nba_api to your local mysql server.
 
@@ -13,7 +13,7 @@ This python script inserts data from nba_api to your local mysql server.
 * Modify template.env file and Enter user, pw, and host
 * Rename rename "template.env" file to ".env"
 
-## Step 2: Navigate to the /nba_dash_v2 folder in command line
+## Step 2: Navigate to the "team1-ADS507" folder in command line
 
 * activate your environment with conda
 
@@ -41,7 +41,18 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## Step 4: Run main.py script
+## Step 4: Navigate to "team1-ADS507/nba_dash" and run `main.py` script
 ```
 python main.py
+```
+Enter :
+> '1' for initial setup (create database and insert backup db)
+> 
+> '2' for update (fetch new data onto existing db)
+> 
+> '3' to start scheduler (update to run every day at 2:00 AM)
+
+## Step 5: Navigae to "team1-ADS507/nba_dash/app" and run `main_menu.py` script
+```
+streamlit run main_menu.py
 ```
