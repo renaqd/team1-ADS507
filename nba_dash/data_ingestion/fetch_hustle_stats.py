@@ -31,7 +31,7 @@ def fetch_game_with_retry(game_id, max_retries=3, base_delay=2):
     
     raise Exception(f"Failed to fetch game {game_id} after {max_retries} attempts")
 
-def fetch_game_ids(days_back=7):
+def fetch_game_ids(days_back):
     try:
         nba_team_ids = set(range(1610612737, 1610612767))
 
