@@ -1,7 +1,7 @@
 temp/*
 **/__pycache__/
 .DS_Store
-
+secrets.toml
 
 # Environments
 .env
