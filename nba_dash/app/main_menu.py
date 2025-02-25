@@ -2,19 +2,27 @@ import streamlit as st
 import team_dashboard
 import player_dashboard
 import dashboard
+import team_v_team
+
+st.set_page_config(
+    page_title="NBA Hustle Dashboard",
+    page_icon=":basketball:"
+)
+    
 
 def main():
-    #st.title("NBA Hustle Stats Dashboard")
-    
-    menu = ["Team Comparison", "Player Comparison", "Player 2"]
+
+    menu = ["Team Overview", "Player Overview", "Player v Player", "Team v Team"]
     choice = st.sidebar.selectbox("Select Dashboard", menu)
     
-    if choice == "Team Comparison":
+    if choice == "Team Overview":
         team_dashboard.run()
-    elif choice == "Player Comparison":
+    elif choice == "Player Overview":
         player_dashboard.run()
-    elif choice == "Player 2":
+    elif choice == "Player v Player":
         dashboard.run()
+    elif choice == "Team v Team":
+        team_v_team.run()
 
 
 if __name__ == "__main__":

@@ -20,7 +20,8 @@ def get_player_stats():
     return df
 
 def run():
-    st.title("NBA Player Comparison Dashboard")
+    st.title("NBA Player Overview")
+    st.markdown("This dashboard allows you to compare hustle stats between NBA players.")
 
     df = get_player_stats()
 
@@ -39,7 +40,8 @@ def run():
 
     # Visualization
     st.subheader(f"Player Comparison: {selected_stat.replace('avg_', '').replace('_', ' ').title()}")
-    fig = px.bar(filtered_df, x='player_name', y=selected_stat, color='team_abbreviation',
+    bar_players = filtered_df.sort_values(by=selected_stat, ascending=False)
+    fig = px.bar(bar_players, x='player_name', y=selected_stat, color='team_abbreviation',
                  labels={selected_stat: selected_stat.replace('avg_', '').replace('_', ' ').title(), 
                          'player_name': 'Player'})
     st.plotly_chart(fig)
