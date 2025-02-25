@@ -10,8 +10,8 @@ This python script inserts data from nba_api to your local mysql server.
 
 ## Step 1: Enter MySQL db connection credentials 
 
-    1. Modify `template.env` file and Enter user, pw, and host
-    2. Rename rename template.env file to `.env`
+   1. Modify `template.env` file and Enter user, pw, and host
+   2. Rename rename template.env file to `.env`
 
 ## Step 2: Navigate to the "team1-ADS507" folder in command line
 
@@ -54,7 +54,7 @@ Enter :
 
 ## Step 5: Navigate to "team1-ADS507/nba_dash/app/.streamlit" and enter db connection credentials 
 
-    1. Modify `template_secrets.toml` file and complete the following (same as .env):
+   1. Modify `template_secrets.toml` file and complete the following (same as .env):
 ```
 [connections.sql]
 dialect = "mysql"
@@ -64,7 +64,7 @@ password = ""
 driver = "pymysql"
 database = "nba_db"
 ```
-    2. Rename rename "template_secrets.toml" file to `secrets.toml`
+   2. Rename rename "template_secrets.toml" file to `secrets.toml`
 
 ## Step 6: Navigae to "team1-ADS507/nba_dash/app" and run `main_menu.py` script
 ```
